@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react({ devTarget: 'es2020' })],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
