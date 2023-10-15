@@ -1,6 +1,7 @@
 # Upload.ia - Web
 
-<video width="400" height="500" controls src="./video.mp4" type="video/mp4"></video>
+<video width="400" height="500" src="https://github.com/Snarloff/uploadai-web/assets/46792575/d5bfad10-5fe4-4b96-86a6-154b1e229eac" type="video/mp4" controls>
+</video>
 
 Este é o repositório da parte web do projeto Upload.ia, que faz parte das séries de vídeos da NLW da Rocketseat. O Upload.ia é um site que permite aos usuários fazer upload de um arquivo de vídeo no formato .mp4 e, por meio da tecnologia WebAssembly e do FFmpeg, transforma o vídeo em um arquivo de áudio otimizado. Posteriormente, esse arquivo de áudio é enviado para a API, onde é utilizado o Whisper, uma IA da OpenAI, para realizar a transcrição automática do áudio.
 
