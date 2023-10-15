@@ -1,12 +1,32 @@
+import { PromptSelect } from '@/components/prompt-select'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
+import { Slider } from '@/components/ui/slider'
 import { Textarea } from '@/components/ui/textarea'
-import { FileVideoIcon, GithubIcon, UploadIcon, Wand2Icon } from 'lucide-react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select'
-import { Slider } from './components/ui/slider'
+import { VideoInputForm } from '@/components/video-input-form'
+import { GithubIcon, Wand2Icon } from 'lucide-react'
+import { useState } from 'react'
+
+import { ReloadIcon } from '@radix-ui/react-icons'
+import { useCompletion } from 'ai/react'
 
 export function App() {
+  const [temperature, setTemperature] = useState(0.5)
+  const [videoId, setVideoId] = useState<string | null>(null)
+
+  const { input, setInput, handleInputChange, handleSubmit, completion, isLoading } = useCompletion({
+    api: 'http://localhost:3333/ai/complete',
+    body: {
+      videoId,
+      temperature,
+    },
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
   return (
     <div className="flex min-h-screen flex-col">
       <div className="flex items-center justify-between border-b px-6 py-3">
@@ -23,8 +43,18 @@ export function App() {
       <main className="flex flex-1 gap-6 p-6">
         <div className="flex flex-1 flex-col gap-4">
           <div className="grid flex-1 grid-rows-2 gap-4">
-            <Textarea placeholder="Inclua o prompt para a IA..." className="resize-none p-4 leading-relaxed" />
-            <Textarea placeholder="Resultado gerado pela IA..." readOnly className="resize-none p-4 leading-relaxed" />
+            <Textarea
+              placeholder="Inclua o prompt para a IA..."
+              className="resize-none p-4 leading-relaxed"
+              value={input}
+              onChange={handleInputChange}
+            />
+            <Textarea
+              readOnly
+              placeholder="Resultado gerado pela IA..."
+              className="resize-none p-4 leading-relaxed"
+              value={completion}
+            />
           </div>
 
           <p className="text-muted-foreground text-sm">
@@ -34,46 +64,13 @@ export function App() {
         </div>
 
         <aside className="w-80 space-y-6">
-          <form className="space-y-6">
-            <label
-              htmlFor="video"
-              className="text-muted-foreground hover:bg-primary/5 flex aspect-video w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed text-sm"
-            >
-              <FileVideoIcon className="h-4 w-4" />
-              Selecione um vídeo
-            </label>
-            <input type="file" id="video" accept="video/mp4" className="sr-only" />
-
-            <Separator />
-
-            <div className="space-y-2">
-              <Label htmlFor="transcription_prompt">Prompt de transcrição</Label>
-              <Textarea
-                id="transcription_prompt"
-                placeholder="Inclua palavras-chave mencionadas no vídeo separadas por vírgula (,)"
-                className="h-20 resize-none p-4 leading-relaxed"
-              />
-            </div>
-
-            <Button type="submit" className="w-full">
-              Carregar vídeo <UploadIcon className="ml-2 h-4 w-4" />
-            </Button>
-          </form>
-
+          <VideoInputForm onVideoUploaded={setVideoId} />
           <Separator />
 
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <Label>Prompt</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione um prompt..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="title">Título do YouTube</SelectItem>
-                  <SelectItem value="description">Descrição do YouTube</SelectItem>
-                </SelectContent>
-              </Select>
+              <PromptSelect onPromptSelected={setInput} />
             </div>
 
             <div className="space-y-2">
@@ -93,7 +90,7 @@ export function App() {
 
             <div className="space-y-4">
               <Label>Temperatura 🔥</Label>
-              <Slider min={0} max={1} step={0.1} />
+              <Slider min={0} max={1} step={0.1} value={[temperature]} onValueChange={(value) => setTemperature(value[0])} />
 
               <span className="text-muted-foreground block text-xs italic leading-relaxed">
                 Valores mais altos tendem a deixar o resultado mais criativo e com possíveis erros
@@ -102,8 +99,16 @@ export function App() {
 
             <Separator />
 
-            <Button type="submit" className="w-full">
-              Executar <Wand2Icon className="ml-2 h-4 w-4" />
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {!isLoading ? (
+                <>
+                  Executar <Wand2Icon className="ml-2 h-4 w-4" />
+                </>
+              ) : (
+                <>
+                  Executando... <ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+                </>
+              )}
             </Button>
           </form>
         </aside>

@@ -1,10 +1,13 @@
-import react from '@vitejs/plugin-react-swc'
+import react from '@vitejs/plugin-react'
 import path from 'path'
 import { defineConfig } from 'vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react({ devTarget: 'es2020' })],
+  plugins: [react()],
+  optimizeDeps: {
+    exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
